@@ -12,20 +12,6 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: '0.0.0.0', // Set the host to 0.0.0.0 to make the server accessible from any device on the network
     },
-    build: {
-      // rollupOptions: {
-      //   external: ['react', 'react-dom', 'react-router', 'react-router-dom', 'react-redux'],
-      //   output: {
-      //     globals: {
-      //       'react': 'React',
-      //       'react-dom': 'ReactDOM',
-      //       'react-router': 'ReactRouter',
-      //       'react-router-dom': 'ReactRouterDOM',
-      //       'react-redux': 'ReactRedux',
-      //     },
-      //   },
-      // },
-    },
   };
 
   if (command !== 'serve') {

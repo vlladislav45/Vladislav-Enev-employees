@@ -16,19 +16,19 @@ class BaseApi {
       // baseURL: API_URL,
       timeout: 30000,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
         'Access-Control-Allow-Origin': '*',
       },
     });
   };
 
-  public get = (url: string, options?: object) => this.api?.get(url, options);
+  public get = (url: string, options?: AxiosRequestConfig) => this.api?.get(url, {...options, data: {}});
 
   public post = (url: string, data: any, options?: AxiosRequestConfig) => this.api?.post(url, data, options);
 
-  public delete = (url: string, options?: object) => this.api?.delete(url, options);
+  public delete = (url: string, options?: AxiosRequestConfig) => this.api?.delete(url, options);
 
-  public put = (url: string, data?: any, options?: object) => this.api?.put(url, data, options);
+  public put = (url: string, data?: any, options?: AxiosRequestConfig) => this.api?.put(url, data, options);
 }
 
 export default BaseApi;

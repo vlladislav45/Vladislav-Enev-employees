@@ -5,6 +5,7 @@ import { FileUploader } from 'react-drag-drop-files';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { maxFileSizeUpload } from '../constants';
+import EmployeeApi from "../api/employee.api.ts";
 
 
 // Styled components
@@ -52,17 +53,58 @@ const HomeDesktop: React.FC = () => {
     setFile(f);
   };
 
-  const handleFileUpload = () => {
-    if(file != null) {
+  const [submit, setSubmitted] = useState<boolean>(false);
 
-    } else toast.warn('Please upload file');
+  const handleFileUpload = async () => {
+    try {
+      if (file !== null) {
+        const formData = new FormData();
+        formData.append('csv', file);
+
+        // Make the API call to upload the file
+        const response = await EmployeeApi.create(formData);
+
+        // Check if the response is successful
+        if (response.status === 200) {
+          console.log('File upload successful', response.data);
+          toast.info('File uploaded successfully');
+          setSubmitted(true);
+        } else {
+          console.error('File upload failed', response.data);
+          toast.error('File upload failed');
+        }
+      } else {
+        toast.warn('Please upload a file');
+      }
+    } catch (error) {
+      console.error('An error occurred during file upload', error);
+      toast.error('An error occurred during file upload');
+    }
   };
+
 
   useEffect(() => {
     setFile(null);
   }, []);
 
   const backgroundImage = 'url("data:image/svg+xml,%3csvg width=\'100%25\' height=\'100%25\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3crect width=\'100%25\' height=\'100%25\' fill=\'none\' rx=\'18\' ry=\'18\' stroke=\'%23000000FF\' stroke-width=\'4\' stroke-dasharray=\'6%2c 14\' stroke-dashoffset=\'0\' stroke-linecap=\'square\'/%3e%3c/svg%3e")';
+
+  useEffect(() => {
+    fetchData();
+  }, [submit]);
+
+  const [data, setData] = useState([]);
+  const fetchData = async () => {
+    try {
+      console.log(EmployeeApi.getAll());
+      const response = await EmployeeApi.getAll(); // Adjust the URL as per your backend route
+      setData(response?.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  console.log(data)
 
   const fileUploadStack = (
     <Box
@@ -107,9 +149,11 @@ const HomeDesktop: React.FC = () => {
     <DefaultLayer>
       <Container>
         <PurpleSection>
-          <Typography variant='h1' sx={{ color: 'white',
-            margin: '44px 0 20px 0' }}>Upload you CSV format with employees</Typography>
-          <StyledButton sx={{ margin: '20px 0' }}>Get Started</StyledButton>
+          <Typography variant='h1' sx={{
+            color: 'white',
+            margin: '44px 0 20px 0'
+          }}>Upload you CSV format with employees</Typography>
+          <StyledButton sx={{margin: '20px 0'}}>Get Started</StyledButton>
         </PurpleSection>
 
         <br/>
@@ -117,11 +161,25 @@ const HomeDesktop: React.FC = () => {
         <br/>
         <br/>
 
-          <FileUploadContainer sx={{ gap: 2 }}>
-            <Typography variant='h3' color={'black'}>Drag and Drop Employees file in CSV format</Typography>
-            <Stack direction='column' gap={5}>
-              <FileUploader handleChange={handleChange} name='file' types={fileTypes} maxSize={maxFileSizeUpload} children={fileUploadStack} />
-              <Button
+        <h1>Employee Data</h1>
+        <ul>
+          {data.map((item, index) => (
+              <li key={index}>
+                Worker ID: {item['workerId1']}, Worker ID: {item['workerId2']}, Common Projects: {item['daysWorked']}
+                <br/>
+              </li>
+          ))}
+        </ul>
+
+        <br/>
+        <br/>
+
+        <FileUploadContainer sx={{gap: 2}}>
+          <Typography variant='h3' color={'black'}>Drag and Drop Employees file in CSV format</Typography>
+          <Stack direction='column' gap={5}>
+            <FileUploader handleChange={handleChange} name='file' types={fileTypes} maxSize={maxFileSizeUpload}
+                          children={fileUploadStack}/>
+            <Button
                 onClick={handleFileUpload}
                 variant='contained'
                 color='primary'
@@ -129,12 +187,13 @@ const HomeDesktop: React.FC = () => {
                   width: '150px',
                   height: '45px',
                   fontWeight: 'normal',
-                  alignSelf: 'center' }}
-              >
-                        Upload file
-              </Button>
-            </Stack>
-          </FileUploadContainer>
+                  alignSelf: 'center'
+                }}
+            >
+              Upload file
+            </Button>
+          </Stack>
+        </FileUploadContainer>
       </Container>
     </DefaultLayer>
   );
