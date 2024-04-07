@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:14
+    restart: on-failure
+    ports:
+      - "55432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: employees
+    volumes:
+      - pg_data:/var/lib/postgresql/data:delegated
+    networks:
+      - default
+
+  nginx:
+    container_name: nginx
+    depends_on:
+      - api
+      - client
+    restart: on-failure
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    ports:
+      - "80:80"
+    networks:
+      - default
+
+  api:
+    depends_on:
+      - db
+    container_name: api
+    build:
+      context: ./api
+      dockerfile: ./Dockerfile.dev
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./api/src:/app/src
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/employees?createDatabaseIfNotExist=true
+    networks:
+      - default
+
+  client:
+    container_name: client
+    depends_on:
+      - api
+    build:
+      context: ./client
+      dockerfile: ./Dockerfile.dev
+    volumes:
+      - ./client/src:/app/client/src
+    ports:
+      - "5173:5173"
+    networks:
+      - default
+
+volumes:
+  pg_data:
+
+networks:
+  default:

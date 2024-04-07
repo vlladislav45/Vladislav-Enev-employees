@@ -1,0 +1,17 @@
+.vscode/
+.idea/
+README.md
+
+/client/.idea
+/client/.github
+/client/node_modules
+/client/.vscode
+/client/Dockerfile.dev
+/client/.gitignore
+
+/api/.idea
+/api/.github
+/api/target
+/api/.vscode
+/api/Dockerfile.dev
+/api/.gitignore
