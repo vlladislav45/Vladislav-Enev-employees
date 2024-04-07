@@ -1,0 +1,8 @@
+FROM nginx:latest
+
+# Install any additional packages or perform other setup specific to the Ubuntu environment
+RUN apt-get update && \
+    apt-get install -y nano && \
+    apt-get clean
+
+COPY ./nginx-dev.conf /etc/nginx/nginx.conf
